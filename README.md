@@ -1,5 +1,75 @@
 # Firebase Authentication
 
+## LR17 + LR18: Firebase Notes App
+
+Проєкт розширено після LR16 і перетворено на захищений Notes App з Firestore Database та Firebase Storage.
+
+### LR17: Firestore Database
+
+- [x] Додано `cloud_firestore`.
+- [x] Створено модель `Note` з `fromJson`, `toJson` і `copyWith`.
+- [x] Реалізовано CRUD для нотаток: create, read, update, delete.
+- [x] Read працює через `StreamBuilder` і Firestore `snapshots()`, тому UI оновлюється real-time.
+- [x] Дані ізольовано за користувачем у структурі `users/{userId}/notes/{noteId}`.
+- [x] Для часу створення й оновлення використовується `FieldValue.serverTimestamp()`.
+- [x] Додано offline persistence у `main.dart`.
+- [x] Додано pagination-поведінку: `getNotesPage()` у service шарі та `Load more` на екрані нотаток.
+- [x] Додано пошук нотаток по title/content.
+
+### LR18: Firebase Storage
+
+- [x] Додано `firebase_storage` та `image_picker`.
+- [x] Реалізовано вибір фото з галереї.
+- [x] Реалізовано upload зображення у Storage.
+- [x] Storage path використовує реальний Firestore `noteId`: `users/{userId}/notes/{noteId}/image_<timestamp>.<ext>`.
+- [x] Після upload download URL зберігається у Firestore полі `imageUrl`.
+- [x] Фото показується у картці нотатки та на екрані редагування.
+- [x] Додано progress indicator через `UploadTask.snapshotEvents`.
+- [x] Додано видалення фото зі Storage разом із нотаткою.
+- [x] Додано перевірку розміру файлу до 5MB.
+- [x] Додано metadata: `contentType`, `sizeBytes`, `userId`, `noteId`, `uploadedAt`.
+- [x] Image flow побудований на `XFile + putData`, тому краще підходить і для mobile, і для web.
+
+### Security Rules
+
+У проєкті є локальні правила Firebase:
+
+- `firestore.rules` дозволяє користувачу читати й змінювати тільки власні нотатки.
+- `storage.rules` дозволяє користувачу працювати тільки з власними файлами нотаток, приймає лише image-файли до 5MB.
+- `firebase.json` підключає обидва rules-файли для deploy.
+
+Deploy правил:
+
+```bash
+firebase deploy --only firestore:rules,storage
+```
+
+### Додатково для якості
+
+- [x] Додано unit tests для `NotesController`.
+- [x] Перевіряється, що нове фото вантажиться саме під реальним `noteId`, а не під тимчасовим id.
+- [x] Додано rollback: якщо upload або Firestore update падає, зайві файли/документи прибираються.
+- [x] Widget test оновлено так, щоб він використовував shared string constants, а не застарілий текст кнопки.
+- [x] Валідація title/content узгоджена з Firestore rules.
+
+### Основні файли LR17/LR18
+
+| Файл | Призначення |
+| :--- | :--- |
+| `lib/models/note.dart` | Firestore model для нотатки |
+| `lib/services/firestore_service.dart` | Facade для читання/запису нотаток |
+| `lib/services/firestore_notes_reader.dart` | Stream, pagination, Firestore read queries |
+| `lib/services/firestore_notes_writer.dart` | Create/update/delete Firestore operations |
+| `lib/services/storage_service.dart` | Upload/delete image, metadata, progress |
+| `lib/controllers/notes_controller.dart` | Координація Firestore + Storage, rollback |
+| `lib/screens/notes_screen.dart` | Notes list, search, Load more, real-time UI |
+| `lib/screens/note_editor_screen.dart` | Create/edit note with image attachment |
+| `test/notes_controller_test.dart` | Unit tests для критичної логіки LR17/LR18 |
+| `firestore.rules` | Firestore security rules |
+| `storage.rules` | Firebase Storage security rules |
+
+---
+
 Цей проєкт є виконанням лабораторної роботи **LR16: Firebase Authentication** з курсу розробки мобільних застосунків на Flutter.
 
 У застосунку реалізовано повний базовий сценарій автентифікації через Firebase: реєстрація користувача, вхід, вихід, відновлення пароля, збереження стану сесії, захищені екрани та обробка помилок. Проєкт налаштований для Android, iOS та Web, а web-версія розгорнута через Firebase Hosting.
@@ -141,49 +211,19 @@
 
 ```text
 lib/
+|-- constants/
 |-- controllers/
-|   `-- home_actions_controller.dart
 |-- dialogs/
-|   |-- delete_account_dialog.dart
-|   |-- logout_dialog.dart
-|   `-- update_name_dialog.dart
 |-- models/
-|   `-- auth_result.dart
 |-- repositories/
-|   `-- auth_repository.dart
 |-- screens/
-|   |-- forgot_password_screen.dart
-|   |-- home_screen.dart
-|   |-- login_screen.dart
-|   |-- profile_screen.dart
-|   |-- settings_screen.dart
-|   `-- sign_up_screen.dart
 |-- services/
-|   `-- firebase_auth_service.dart
+|-- theme/
 |-- utils/
-|   |-- firebase_error_mapper.dart
-|   |-- snack_bar_helper.dart
-|   `-- validators.dart
 |-- widgets/
 |   |-- auth/
-|   |   |-- auth_screen_layout.dart
-|   |   |-- forgot_password_form.dart
-|   |   |-- login_form.dart
-|   |   `-- sign_up_form.dart
 |   |-- home/
-|   |   |-- account_actions_section.dart
-|   |   |-- email_verification_badge.dart
-|   |   |-- home_header.dart
-|   |   |-- logout_button.dart
-|   |   |-- protected_routes_section.dart
-|   |   |-- session_card.dart
-|   |   `-- user_avatar.dart
-|   |-- action_tile.dart
-|   |-- app_button.dart
-|   |-- app_text_field.dart
-|   |-- auth_wrapper.dart
-|   |-- protected_access_denied.dart
-|   `-- protected_route.dart
+|   `-- notes/
 |-- firebase_options.dart
 `-- main.dart
 ```

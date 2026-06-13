@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+
 class SessionCard extends StatelessWidget {
   const SessionCard({super.key});
 
@@ -26,7 +28,7 @@ class SessionCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '✅ You are logged in!',
+              HomeStrings.sessionTitle,
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -34,7 +36,7 @@ class SessionCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your session is active and secure.',
+              HomeStrings.sessionSubtitle,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

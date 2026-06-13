@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../repositories/auth_repository.dart';
-import '../widgets/protected_route.dart';
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+import 'package:lr16_firebase_auth/widgets/protected_route.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
 
 class SettingsScreen extends StatelessWidget {
   final AuthStateRepository authStateRepository;
@@ -11,39 +12,50 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProtectedRoute(
       authStateRepository: authStateRepository,
-      title: 'Settings',
+      title: HomeStrings.settingsTitle,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Settings')),
-        body: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            _SettingsTile(
-              icon: Icons.lock_outline,
-              title: 'Protected route',
-              subtitle: 'Only authenticated users can open this screen',
-              value: 'Active',
-            ),
-            const SizedBox(height: 12),
-            _SettingsTile(
-              icon: Icons.sync_outlined,
-              title: 'Auth state persistence',
-              subtitle: 'Firebase keeps the user session between app launches',
-              value: authStateRepository.isSignedIn
-                  ? 'Signed in'
-                  : 'Signed out',
-            ),
-            const SizedBox(height: 12),
-            _SettingsTile(
-              icon: Icons.email_outlined,
-              title: 'Current account',
-              subtitle: authStateRepository.currentEmail ?? 'No email',
-              value: authStateRepository.isEmailVerified
-                  ? 'Verified'
-                  : 'Unverified',
-            ),
-          ],
-        ),
+        appBar: AppBar(title: const Text(HomeStrings.settingsTitle)),
+        body: _SettingsBody(authStateRepository: authStateRepository),
       ),
+    );
+  }
+}
+
+class _SettingsBody extends StatelessWidget {
+  final AuthStateRepository authStateRepository;
+
+  const _SettingsBody({required this.authStateRepository});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        const _SettingsTile(
+          icon: Icons.lock_outline,
+          title: HomeStrings.protectedRouteTile,
+          subtitle: HomeStrings.protectedRouteSubtitle,
+          value: HomeStrings.protectedRouteActive,
+        ),
+        const SizedBox(height: 12),
+        _SettingsTile(
+          icon: Icons.sync_outlined,
+          title: HomeStrings.authPersistenceTile,
+          subtitle: HomeStrings.authPersistenceSubtitle,
+          value: authStateRepository.isSignedIn
+              ? HomeStrings.signedIn
+              : HomeStrings.signedOut,
+        ),
+        const SizedBox(height: 12),
+        _SettingsTile(
+          icon: Icons.email_outlined,
+          title: HomeStrings.currentAccountTile,
+          subtitle: authStateRepository.currentEmail ?? HomeStrings.noEmail,
+          value: authStateRepository.isEmailVerified
+              ? HomeStrings.verified
+              : HomeStrings.unverified,
+        ),
+      ],
     );
   }
 }

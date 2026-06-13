@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
-import '../repositories/auth_repository.dart';
-import '../screens/home_screen.dart';
-import '../screens/login_screen.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/repositories/notes_repository.dart';
+import 'package:lr16_firebase_auth/repositories/storage_repository.dart';
+import 'package:lr16_firebase_auth/screens/home_screen.dart';
+import 'package:lr16_firebase_auth/screens/login_screen.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
 
 class AuthWrapper extends StatelessWidget {
   final AuthRepository authRepository;
+  final NotesRepository notesRepository;
+  final StorageRepository storageRepository;
 
-  const AuthWrapper({super.key, required this.authRepository});
+  const AuthWrapper({
+    super.key,
+    required this.authRepository,
+    required this.notesRepository,
+    required this.storageRepository,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +34,7 @@ class AuthWrapper extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Loading...',
+                    AuthStrings.loading,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -48,12 +58,12 @@ class AuthWrapper extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Something went wrong',
+                    AuthStrings.errorTitle,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Please restart the app',
+                    AuthStrings.errorRestart,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
@@ -64,7 +74,11 @@ class AuthWrapper extends StatelessWidget {
 
         final isSignedIn = snapshot.data ?? false;
         if (isSignedIn) {
-          return HomeScreen(authRepository: authRepository);
+          return HomeScreen(
+            authRepository: authRepository,
+            notesRepository: notesRepository,
+            storageRepository: storageRepository,
+          );
         }
 
         return LoginScreen(authRepository: authRepository);

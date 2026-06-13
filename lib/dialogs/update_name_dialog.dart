@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../utils/validators.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+import 'package:lr16_firebase_auth/constants/app_strings.dart';
+import 'package:lr16_firebase_auth/utils/validators.dart';
 
 Future<String?> showUpdateNameDialog(
   BuildContext context, {
@@ -47,11 +50,11 @@ class _UpdateNameDialogState extends State<_UpdateNameDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Update Name'),
+      title: const Text(HomeStrings.updateNameTitle),
       content: TextField(
         controller: _nameController,
         decoration: InputDecoration(
-          labelText: 'Display Name',
+          labelText: AuthStrings.displayNameLabel,
           prefixIcon: Icon(
             Icons.person_outline,
             color: Theme.of(context).colorScheme.primary,
@@ -65,11 +68,11 @@ class _UpdateNameDialogState extends State<_UpdateNameDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(AppStrings.cancelButton),
         ),
         FilledButton(
           onPressed: _canSubmit ? _submit : null,
-          child: const Text('Update'),
+          child: const Text(HomeStrings.updateButton),
         ),
       ],
     );
@@ -103,7 +106,7 @@ class _UpdateNameDialogState extends State<_UpdateNameDialog> {
 
   String? _validateName() {
     return Validators.compose([
-      (v) => Validators.required(v, fieldName: 'Name'),
+      (v) => Validators.required(v, fieldName: AuthStrings.nameFieldName),
       Validators.name,
     ])(_nameController.text);
   }

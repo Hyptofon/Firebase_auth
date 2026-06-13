@@ -1,87 +1,47 @@
 import 'package:flutter/material.dart';
-import '../repositories/auth_repository.dart';
-import '../widgets/auth/auth_screen_layout.dart';
-import '../widgets/auth/login_form.dart';
-import 'forgot_password_screen.dart';
-import 'sign_up_screen.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/screens/forgot_password_screen.dart';
+import 'package:lr16_firebase_auth/screens/sign_up_screen.dart';
+import 'package:lr16_firebase_auth/widgets/auth/auth_screen_layout.dart';
+import 'package:lr16_firebase_auth/widgets/auth/login_form.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   final AuthCredentialsRepository authRepository;
 
   const LoginScreen({super.key, required this.authRepository});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController;
-  late final Animation<double> _fadeAnimation;
-  late final Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOutCubic,
-          ),
-        );
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: AuthScreenLayout(
-            mobileTopSpacing: 60,
-            child: LoginForm(
-              authRepository: widget.authRepository,
-              onSignUp: _navigateToSignUp,
-              onForgotPassword: _navigateToForgotPassword,
-            ),
+      body: AnimatedAuthContent(
+        duration: const Duration(milliseconds: 800),
+        beginOffset: const Offset(0, 0.1),
+        child: AuthScreenLayout(
+          mobileTopSpacing: 60,
+          child: LoginForm(
+            authRepository: authRepository,
+            onSignUp: () => _navigateToSignUp(context),
+            onForgotPassword: () => _navigateToForgotPassword(context),
           ),
         ),
       ),
     );
   }
 
-  void _navigateToSignUp() {
+  void _navigateToSignUp(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SignUpScreen(authRepository: widget.authRepository),
+        builder: (_) => SignUpScreen(authRepository: authRepository),
       ),
     );
   }
 
-  void _navigateToForgotPassword() {
+  void _navigateToForgotPassword(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            ForgotPasswordScreen(authRepository: widget.authRepository),
+        builder: (_) => ForgotPasswordScreen(authRepository: authRepository),
       ),
     );
   }

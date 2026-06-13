@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../models/auth_result.dart';
-import '../../repositories/auth_repository.dart';
-import '../../utils/snack_bar_helper.dart';
-import '../../utils/validators.dart';
-import '../app_button.dart';
-import '../app_text_field.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
+import 'package:lr16_firebase_auth/utils/snack_bar_helper.dart';
+import 'package:lr16_firebase_auth/utils/validators.dart';
+import 'package:lr16_firebase_auth/widgets/app_button.dart';
+import 'package:lr16_firebase_auth/widgets/app_text_field.dart';
 
 class ForgotPasswordForm extends StatefulWidget {
   final AuthCredentialsRepository authRepository;
@@ -100,7 +101,9 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
         ),
         const SizedBox(height: 24),
         Text(
-          _emailSent ? 'Email Sent!' : 'Forgot Password?',
+          _emailSent
+              ? AuthStrings.resetEmailSentTitle
+              : AuthStrings.resetPasswordTitle,
           style: textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
@@ -110,8 +113,8 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
         const SizedBox(height: 12),
         Text(
           _emailSent
-              ? 'We\'ve sent a password reset link to your email. Check your inbox and follow the instructions.'
-              : 'Enter your email address and we\'ll send you a link to reset your password.',
+              ? AuthStrings.resetEmailSentSubtitle
+              : AuthStrings.resetPasswordSubtitle,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -163,13 +166,13 @@ class _SuccessActions extends StatelessWidget {
         const SizedBox(height: 24),
         AppPrimaryButton(
           onPressed: onBack,
-          label: 'BACK TO LOGIN',
+          label: AuthStrings.backToLogin,
           icon: Icons.arrow_back,
         ),
         const SizedBox(height: 16),
         TextButton(
           onPressed: onRetry,
-          child: const Text('Didn\'t receive email? Try again'),
+          child: const Text(AuthStrings.resetEmailRetry),
         ),
       ],
     );
@@ -202,13 +205,14 @@ class _ResetPasswordFields extends StatelessWidget {
         children: [
           AppTextField(
             controller: emailController,
-            labelText: 'Email',
+            labelText: AuthStrings.emailLabel,
             prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => onSubmit(),
             validator: Validators.compose([
-              (v) => Validators.required(v, fieldName: 'Email'),
+              (v) =>
+                  Validators.required(v, fieldName: AuthStrings.emailFieldName),
               Validators.email,
             ]),
             autovalidateMode: autovalidateMode,
@@ -216,7 +220,7 @@ class _ResetPasswordFields extends StatelessWidget {
           const SizedBox(height: 24),
           AppPrimaryButton(
             onPressed: canSubmit ? onSubmit : null,
-            label: 'SEND RESET LINK',
+            label: AuthStrings.resetPasswordButton,
             isLoading: isLoading,
             icon: Icons.send,
           ),

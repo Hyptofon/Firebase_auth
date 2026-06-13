@@ -1,4 +1,4 @@
-import '../models/auth_result.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
 
 abstract class AuthStateRepository {
   Stream<bool> get authStateChanges;

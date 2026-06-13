@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../repositories/auth_repository.dart';
-import '../../screens/profile_screen.dart';
-import '../../screens/settings_screen.dart';
-import '../action_tile.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/screens/profile_screen.dart';
+import 'package:lr16_firebase_auth/screens/settings_screen.dart';
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+import 'package:lr16_firebase_auth/widgets/action_tile.dart';
 
 class ProtectedRoutesSection extends StatelessWidget {
   final AuthStateRepository authStateRepository;
@@ -15,8 +16,8 @@ class ProtectedRoutesSection extends StatelessWidget {
       children: [
         ActionTile(
           icon: Icons.badge_outlined,
-          title: 'View Profile',
-          subtitle: 'Open protected profile screen',
+          title: HomeStrings.viewProfileTitle,
+          subtitle: HomeStrings.viewProfileSubtitle,
           onTap: () => _open(
             context,
             ProfileScreen(authStateRepository: authStateRepository),
@@ -25,8 +26,8 @@ class ProtectedRoutesSection extends StatelessWidget {
         const SizedBox(height: 8),
         ActionTile(
           icon: Icons.settings_outlined,
-          title: 'Settings',
-          subtitle: 'Open protected settings screen',
+          title: HomeStrings.settingsTitle,
+          subtitle: HomeStrings.settingsSubtitle,
           onTap: () => _open(
             context,
             SettingsScreen(authStateRepository: authStateRepository),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../controllers/home_actions_controller.dart';
-import '../../dialogs/logout_dialog.dart';
-import '../../models/auth_result.dart';
-import '../../utils/snack_bar_helper.dart';
+import 'package:lr16_firebase_auth/controllers/home_actions_controller.dart';
+import 'package:lr16_firebase_auth/dialogs/logout_dialog.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+import 'package:lr16_firebase_auth/utils/snack_bar_helper.dart';
 
 class LogoutButton extends StatelessWidget {
   final HomeActionsController controller;
@@ -13,7 +14,7 @@ class LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.logout),
-      tooltip: 'Logout',
+      tooltip: HomeStrings.logoutButton,
       onPressed: () => _logout(context),
     );
   }

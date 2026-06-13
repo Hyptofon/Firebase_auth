@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+
 class EmailVerificationBadge extends StatelessWidget {
   final bool isVerified;
 
@@ -27,7 +29,9 @@ class EmailVerificationBadge extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            isVerified ? 'Email verified' : 'Email not verified',
+            isVerified
+                ? HomeStrings.emailVerified
+                : HomeStrings.emailNotVerified,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: isVerified
                   ? colorScheme.onTertiaryContainer

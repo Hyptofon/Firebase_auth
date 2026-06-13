@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../controllers/home_actions_controller.dart';
-import '../../dialogs/delete_account_dialog.dart';
-import '../../dialogs/update_name_dialog.dart';
-import '../../models/auth_result.dart';
-import '../../repositories/auth_repository.dart';
-import '../../utils/snack_bar_helper.dart';
-import '../action_tile.dart';
+import 'package:lr16_firebase_auth/controllers/home_actions_controller.dart';
+import 'package:lr16_firebase_auth/dialogs/delete_account_dialog.dart';
+import 'package:lr16_firebase_auth/dialogs/update_name_dialog.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+import 'package:lr16_firebase_auth/utils/snack_bar_helper.dart';
+import 'package:lr16_firebase_auth/widgets/action_tile.dart';
 
 class AccountActionsSection extends StatefulWidget {
   final AuthStateRepository authStateRepository;
@@ -38,24 +39,24 @@ class _AccountActionsSectionState extends State<AccountActionsSection> {
       children: [
         ActionTile(
           icon: Icons.person_outline,
-          title: 'Update Name',
-          subtitle: 'Change your display name',
+          title: HomeStrings.updateNameTitle,
+          subtitle: HomeStrings.updateNameSubtitle,
           onTap: _updateDisplayName,
         ),
         const SizedBox(height: 8),
         if (!emailVerified) ...[
           ActionTile(
             icon: Icons.mark_email_unread_outlined,
-            title: 'Verify Email',
-            subtitle: 'Send verification email',
+            title: HomeStrings.verifyEmailTitle,
+            subtitle: HomeStrings.verifyEmailSubtitle,
             onTap: _sendVerificationEmail,
           ),
           const SizedBox(height: 8),
         ],
         ActionTile(
           icon: Icons.delete_forever_outlined,
-          title: 'Delete Account',
-          subtitle: 'Permanently delete your account',
+          title: HomeStrings.deleteAccountTitle,
+          subtitle: HomeStrings.deleteAccountSubtitle,
           onTap: _deleteAccount,
           isDestructive: true,
         ),
@@ -76,7 +77,7 @@ class _AccountActionsSectionState extends State<AccountActionsSection> {
 
     await _runAction(
       () => widget.controller.updateDisplayName(newName),
-      successMessage: 'Name updated successfully!',
+      successMessage: HomeStrings.nameUpdated,
       onSuccess: widget.onAccountChanged,
     );
   }

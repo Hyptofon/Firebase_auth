@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// A shared text field that inherits all border and fill styles from the
+/// app theme ([AppTheme]).  Border states are defined once in
+/// [AppTheme.build] and are NOT overridden here — any theme change is
+/// automatically reflected in every [AppTextField].
 class AppTextField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
@@ -45,27 +49,8 @@ class AppTextField extends StatelessWidget {
             ? Icon(prefixIcon, color: colorScheme.primary)
             : null,
         suffixIcon: suffixIcon,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.5),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.error, width: 2),
-        ),
-        filled: true,
-        fillColor: colorScheme.surfaceContainerLowest,
+        // Borders are inherited from InputDecorationTheme in AppTheme —
+        // no local overrides needed.
       ),
     );
   }

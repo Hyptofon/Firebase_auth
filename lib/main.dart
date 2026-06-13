@@ -1,96 +1,66 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/repositories/notes_repository.dart';
+import 'package:lr16_firebase_auth/repositories/storage_repository.dart';
+import 'package:lr16_firebase_auth/services/firebase_auth_service.dart';
+import 'package:lr16_firebase_auth/services/firestore_service.dart';
+import 'package:lr16_firebase_auth/services/storage_service.dart';
+import 'package:lr16_firebase_auth/theme/app_theme.dart';
+import 'package:lr16_firebase_auth/widgets/auth_wrapper.dart';
+
 import 'firebase_options.dart';
-import 'repositories/auth_repository.dart';
-import 'services/firebase_auth_service.dart';
-import 'widgets/auth_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  final authRepository = FirebaseAuthService();
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
 
-  runApp(MyApp(authRepository: authRepository));
+  final authRepository = FirebaseAuthService();
+  final notesRepository = FirestoreService();
+  final storageRepository = StorageService();
+
+  runApp(
+    MyApp(
+      authRepository: authRepository,
+      notesRepository: notesRepository,
+      storageRepository: storageRepository,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepository authRepository;
+  final NotesRepository notesRepository;
+  final StorageRepository storageRepository;
 
-  const MyApp({super.key, required this.authRepository});
+  const MyApp({
+    super.key,
+    required this.authRepository,
+    required this.notesRepository,
+    required this.storageRepository,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Auth',
+      title: HomeStrings.appTitle,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4F46E5),
-          brightness: Brightness.light,
-        ),
-        appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        cardTheme: CardThemeData(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        snackBarTheme: SnackBarThemeData(
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4F46E5),
-          brightness: Brightness.dark,
-        ),
-        appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        cardTheme: CardThemeData(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        snackBarTheme: SnackBarThemeData(
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      ),
+      theme: AppTheme.build(Brightness.light),
+      darkTheme: AppTheme.build(Brightness.dark),
       themeMode: ThemeMode.system,
-      home: AuthWrapper(authRepository: authRepository),
+      home: AuthWrapper(
+        authRepository: authRepository,
+        notesRepository: notesRepository,
+        storageRepository: storageRepository,
+      ),
     );
   }
 }

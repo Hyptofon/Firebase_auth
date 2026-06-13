@@ -1,61 +1,32 @@
 import 'package:flutter/material.dart';
-import '../repositories/auth_repository.dart';
-import '../widgets/auth/auth_screen_layout.dart';
-import '../widgets/auth/sign_up_form.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/widgets/auth/auth_screen_layout.dart';
+import 'package:lr16_firebase_auth/widgets/auth/sign_up_form.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignUpScreen extends StatelessWidget {
   final AuthCredentialsRepository authRepository;
 
   const SignUpScreen({super.key, required this.authRepository});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
-}
-
-class _SignUpScreenState extends State<SignUpScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController;
-  late final Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up')),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
+      appBar: AppBar(title: const Text(AuthStrings.signUpAppBar)),
+      body: AnimatedAuthContent(
         child: AuthScreenLayout(
           mobileTopSpacing: 16,
           child: SignUpForm(
-            authRepository: widget.authRepository,
-            onLogin: _close,
-            onAccountCreated: _close,
+            authRepository: authRepository,
+            onLogin: () => _close(context),
+            onAccountCreated: () => _close(context),
           ),
         ),
       ),
     );
   }
 
-  void _close() {
+  void _close(BuildContext context) {
     Navigator.pop(context);
   }
 }

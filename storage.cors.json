@@ -1,0 +1,13 @@
+[
+  {
+    "origin": [
+      "https://fir-116ef.web.app",
+      "http://localhost:5000",
+      "http://localhost:8080",
+      "http://localhost:3000"
+    ],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

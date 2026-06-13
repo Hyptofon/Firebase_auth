@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../models/auth_result.dart';
-import '../../repositories/auth_repository.dart';
-import '../../utils/snack_bar_helper.dart';
-import '../../utils/validators.dart';
-import '../app_button.dart';
-import '../app_text_field.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
+import 'package:lr16_firebase_auth/utils/snack_bar_helper.dart';
+import 'package:lr16_firebase_auth/utils/validators.dart';
+import 'package:lr16_firebase_auth/widgets/app_button.dart';
+import 'package:lr16_firebase_auth/widgets/app_text_field.dart';
 
 class LoginForm extends StatefulWidget {
   final AuthCredentialsRepository authRepository;
@@ -112,7 +113,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: 24),
           Text(
-            'Welcome Back',
+            AuthStrings.loginTitle,
             style: textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurface,
@@ -121,7 +122,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Sign in to your account',
+            AuthStrings.loginSubtitle,
             style: textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -130,12 +131,13 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: 40),
           AppTextField(
             controller: _emailController,
-            labelText: 'Email',
+            labelText: AuthStrings.emailLabel,
             prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             validator: Validators.compose([
-              (v) => Validators.required(v, fieldName: 'Email'),
+              (v) =>
+                  Validators.required(v, fieldName: AuthStrings.emailFieldName),
               Validators.email,
             ]),
             autovalidateMode: _autovalidateMode,
@@ -143,12 +145,12 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: 16),
           PasswordTextField(
             controller: _passwordController,
-            labelText: 'Password',
+            labelText: AuthStrings.passwordLabel,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _login(),
-            validator: Validators.compose([
-              (v) => Validators.required(v, fieldName: 'Password'),
-            ]),
+            // In login, the password field only needs to be non-empty;
+            // Validators.password handles that check directly.
+            validator: Validators.password,
             autovalidateMode: _autovalidateMode,
           ),
           const SizedBox(height: 8),
@@ -157,7 +159,7 @@ class _LoginFormState extends State<LoginForm> {
             child: TextButton(
               onPressed: widget.onForgotPassword,
               child: Text(
-                'Forgot Password?',
+                AuthStrings.forgotPassword,
                 style: TextStyle(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w500,
@@ -168,7 +170,7 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: 16),
           AppPrimaryButton(
             onPressed: _canSubmit ? _login : null,
-            label: 'LOGIN',
+            label: AuthStrings.loginButton,
             isLoading: _isLoading,
             icon: Icons.login,
           ),
@@ -179,7 +181,7 @@ class _LoginFormState extends State<LoginForm> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'OR',
+                  AuthStrings.orDivider,
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
@@ -194,7 +196,7 @@ class _LoginFormState extends State<LoginForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Don't have an account?",
+                AuthStrings.noAccount,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -202,7 +204,7 @@ class _LoginFormState extends State<LoginForm> {
               TextButton(
                 onPressed: widget.onSignUp,
                 child: Text(
-                  'Sign Up',
+                  AuthStrings.signUpButton,
                   style: TextStyle(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,

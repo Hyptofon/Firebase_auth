@@ -1,5 +1,6 @@
-import '../models/auth_result.dart';
-import '../repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
 
 class HomeActionsController {
   final AuthCredentialsRepository authCredentialsRepository;
@@ -28,8 +29,8 @@ class HomeActionsController {
     final email = authStateRepository.currentEmail;
     if (email == null) {
       return const AuthFailure(
-        message: 'No user is currently signed in.',
-        code: 'no-user',
+        message: AuthStrings.noUserError,
+        code: AuthStrings.noUserCode,
       );
     }
 

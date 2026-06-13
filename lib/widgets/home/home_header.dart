@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
-import '../../repositories/auth_repository.dart';
+
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
 import 'email_verification_badge.dart';
 import 'user_avatar.dart';
 
 class HomeHeader extends StatefulWidget {
-  final AuthStateRepository authStateRepository;
+  final String? displayName;
+  final String? email;
+  final bool isEmailVerified;
 
-  const HomeHeader({super.key, required this.authStateRepository});
+  const HomeHeader({
+    super.key,
+    this.displayName,
+    this.email,
+    required this.isEmailVerified,
+  });
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -41,9 +49,9 @@ class _HomeHeaderState extends State<HomeHeader>
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final displayName = widget.authStateRepository.currentDisplayName;
-    final email = widget.authStateRepository.currentEmail ?? '';
-    final emailVerified = widget.authStateRepository.isEmailVerified;
+    final displayName = widget.displayName;
+    final email = widget.email ?? '';
+    final emailVerified = widget.isEmailVerified;
 
     return Column(
       children: [
@@ -54,7 +62,7 @@ class _HomeHeaderState extends State<HomeHeader>
         ),
         const SizedBox(height: 20),
         Text(
-          'Hello, ${displayName ?? 'User'}!',
+          HomeStrings.greetingText(displayName),
           style: textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,

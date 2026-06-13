@@ -1,0 +1,58 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function hasValidNoteFields(userId) {
+      return request.resource.data.keys().hasOnly([
+          'title',
+          'content',
+          'imageUrl',
+          'userId',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'title',
+          'content',
+          'userId',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.content is string
+        && request.resource.data.content.size() <= 10000
+        && request.resource.data.userId == userId
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
+        && (!('imageUrl' in request.resource.data)
+          || request.resource.data.imageUrl == null
+          || (request.resource.data.imageUrl is string
+            && request.resource.data.imageUrl.size() <= 2048));
+    }
+
+    match /users/{userId}/notes/{noteId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && hasValidNoteFields(userId);
+      allow update: if isOwner(userId)
+        && resource.data.userId == userId
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && hasValidNoteFields(userId);
+      allow delete: if isOwner(userId) && resource.data.userId == userId;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../models/auth_result.dart';
-import '../../repositories/auth_repository.dart';
-import '../../utils/snack_bar_helper.dart';
-import '../../utils/validators.dart';
-import '../app_button.dart';
-import '../app_text_field.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
+import 'package:lr16_firebase_auth/utils/snack_bar_helper.dart';
+import 'package:lr16_firebase_auth/utils/validators.dart';
+import 'package:lr16_firebase_auth/widgets/app_button.dart';
+import 'package:lr16_firebase_auth/widgets/app_text_field.dart';
 
 class SignUpForm extends StatefulWidget {
   final AuthCredentialsRepository authRepository;
@@ -79,7 +80,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
     switch (result) {
       case AuthSuccess():
-        context.showSuccessSnackBar('Account created successfully!');
+        context.showSuccessSnackBar(AuthStrings.signUpSuccess);
         widget.onAccountCreated();
         break;
       case AuthMessageSuccess():
@@ -126,7 +127,7 @@ class _SignUpFormState extends State<SignUpForm> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Create Account',
+            AuthStrings.signUpTitle,
             style: textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurface,
@@ -135,7 +136,7 @@ class _SignUpFormState extends State<SignUpForm> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Fill in the details to get started',
+            AuthStrings.signUpSubtitle,
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -144,11 +145,12 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 32),
           AppTextField(
             controller: _nameController,
-            labelText: 'Full Name',
+            labelText: AuthStrings.nameLabel,
             prefixIcon: Icons.person_outline,
             textInputAction: TextInputAction.next,
             validator: Validators.compose([
-              (v) => Validators.required(v, fieldName: 'Name'),
+              (v) =>
+                  Validators.required(v, fieldName: AuthStrings.nameFieldName),
               Validators.name,
             ]),
             autovalidateMode: _autovalidateMode,
@@ -156,12 +158,13 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 16),
           AppTextField(
             controller: _emailController,
-            labelText: 'Email',
+            labelText: AuthStrings.emailLabel,
             prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             validator: Validators.compose([
-              (v) => Validators.required(v, fieldName: 'Email'),
+              (v) =>
+                  Validators.required(v, fieldName: AuthStrings.emailFieldName),
               Validators.email,
             ]),
             autovalidateMode: _autovalidateMode,
@@ -169,22 +172,24 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 16),
           PasswordTextField(
             controller: _passwordController,
-            labelText: 'Password',
+            labelText: AuthStrings.passwordLabel,
             textInputAction: TextInputAction.next,
-            validator: Validators.compose([
-              (v) => Validators.required(v, fieldName: 'Password'),
-              Validators.password,
-            ]),
+            // Validators.password now validates non-empty itself
+            // - no need to compose with required().
+            validator: Validators.password,
             autovalidateMode: _autovalidateMode,
           ),
           const SizedBox(height: 16),
           PasswordTextField(
             controller: _confirmPasswordController,
-            labelText: 'Confirm Password',
+            labelText: AuthStrings.confirmPasswordLabel,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _signUp(),
             validator: Validators.compose([
-              (v) => Validators.required(v, fieldName: 'Confirm password'),
+              (v) => Validators.required(
+                v,
+                fieldName: AuthStrings.confirmPasswordLabel,
+              ),
               Validators.confirmPassword(() => _passwordController.text),
             ]),
             autovalidateMode: _autovalidateMode,
@@ -192,7 +197,7 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 32),
           AppPrimaryButton(
             onPressed: _canSubmit ? _signUp : null,
-            label: 'CREATE ACCOUNT',
+            label: AuthStrings.signUpButton,
             isLoading: _isLoading,
             icon: Icons.person_add,
           ),
@@ -201,7 +206,7 @@ class _SignUpFormState extends State<SignUpForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Already have an account?',
+                AuthStrings.alreadyHaveAccount,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -209,7 +214,7 @@ class _SignUpFormState extends State<SignUpForm> {
               TextButton(
                 onPressed: widget.onLogin,
                 child: Text(
-                  'Login',
+                  AuthStrings.loginButton,
                   style: TextStyle(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,

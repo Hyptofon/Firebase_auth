@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../repositories/auth_repository.dart';
-import 'protected_access_denied.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/widgets/protected_access_denied.dart';
 
 class ProtectedRoute extends StatelessWidget {
   final AuthStateRepository authStateRepository;

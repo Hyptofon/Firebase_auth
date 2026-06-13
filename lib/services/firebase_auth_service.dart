@@ -1,15 +1,35 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/auth_result.dart';
-import '../repositories/auth_repository.dart';
-import '../utils/firebase_error_mapper.dart';
+import 'package:lr16_firebase_auth/models/auth_result.dart';
+import 'package:lr16_firebase_auth/repositories/auth_repository.dart';
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
+import 'package:lr16_firebase_auth/utils/firebase_error_mapper.dart';
 
 class FirebaseAuthService implements AuthRepository {
   final FirebaseAuth _auth;
   final FirebaseErrorMapper _errorMapper;
 
+  static const AuthFailure _noUserError = AuthFailure(
+    message: AuthStrings.noUserError,
+    code: AuthStrings.noUserCode,
+  );
+
   FirebaseAuthService({FirebaseAuth? auth, FirebaseErrorMapper? errorMapper})
     : _auth = auth ?? FirebaseAuth.instance,
       _errorMapper = errorMapper ?? const FirebaseErrorMapper();
+
+  Future<AuthResult> _withCurrentUser(
+    Future<AuthResult> Function(User user) action,
+  ) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return _noUserError;
+      return await action(user);
+    } on FirebaseAuthException catch (e) {
+      return _mapException(e);
+    } catch (e) {
+      return _mapUnknownError(e);
+    }
+  }
 
   @override
   Stream<bool> get authStateChanges =>
@@ -42,8 +62,8 @@ class FirebaseAuthService implements AuthRepository {
       final user = credential.user;
       if (user == null) {
         return const AuthFailure(
-          message: 'Failed to create account. Please try again.',
-          code: 'unknown',
+          message: AuthStrings.createAccountFailed,
+          code: AuthStrings.unknownErrorCode,
         );
       }
 
@@ -73,8 +93,8 @@ class FirebaseAuthService implements AuthRepository {
 
       if (credential.user == null) {
         return const AuthFailure(
-          message: 'Failed to sign in. Please try again.',
-          code: 'unknown',
+          message: AuthStrings.signInFailed,
+          code: AuthStrings.unknownErrorCode,
         );
       }
 
@@ -90,11 +110,11 @@ class FirebaseAuthService implements AuthRepository {
   Future<AuthResult> signOut() async {
     try {
       await _auth.signOut();
-      return const AuthMessageSuccess(message: 'Signed out successfully');
+      return const AuthMessageSuccess(message: AuthStrings.signOutSuccess);
     } catch (e) {
       return AuthFailure(
-        message: 'Failed to sign out: $e',
-        code: 'sign-out-failed',
+        message: '${AuthStrings.signOutFailedPrefix}$e',
+        code: AuthStrings.signOutFailedCode,
       );
     }
   }
@@ -104,7 +124,7 @@ class FirebaseAuthService implements AuthRepository {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
       return const AuthMessageSuccess(
-        message: 'Password reset email sent. Check your inbox.',
+        message: AuthStrings.passwordResetEmailSent,
       );
     } on FirebaseAuthException catch (e) {
       return _mapException(e);
@@ -114,98 +134,43 @@ class FirebaseAuthService implements AuthRepository {
   }
 
   @override
-  Future<AuthResult> sendEmailVerification() async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) {
-        return const AuthFailure(
-          message: 'No user is currently signed in.',
-          code: 'no-user',
-        );
-      }
-
-      if (user.emailVerified) {
-        return const AuthMessageSuccess(message: 'Email is already verified.');
-      }
-
-      await user.sendEmailVerification();
+  Future<AuthResult> sendEmailVerification() => _withCurrentUser((user) async {
+    if (user.emailVerified) {
       return const AuthMessageSuccess(
-        message: 'Verification email sent. Check your inbox.',
+        message: AuthStrings.emailAlreadyVerified,
       );
-    } on FirebaseAuthException catch (e) {
-      return _mapException(e);
-    } catch (e) {
-      return _mapUnknownError(e);
     }
-  }
+
+    await user.sendEmailVerification();
+    return const AuthMessageSuccess(message: AuthStrings.verificationEmailSent);
+  });
 
   @override
-  Future<AuthResult> updateDisplayName({required String displayName}) async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) {
-        return const AuthFailure(
-          message: 'No user is currently signed in.',
-          code: 'no-user',
-        );
-      }
-
-      await user.updateDisplayName(displayName.trim());
-      await user.reload();
-      return _buildAuthSuccess();
-    } on FirebaseAuthException catch (e) {
-      return _mapException(e);
-    } catch (e) {
-      return _mapUnknownError(e);
-    }
-  }
+  Future<AuthResult> updateDisplayName({required String displayName}) =>
+      _withCurrentUser((user) async {
+        await user.updateDisplayName(displayName.trim());
+        await user.reload();
+        return _buildAuthSuccess();
+      });
 
   @override
-  Future<AuthResult> deleteAccount() async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) {
-        return const AuthFailure(
-          message: 'No user is currently signed in.',
-          code: 'no-user',
-        );
-      }
-
-      await user.delete();
-      return const AuthMessageSuccess(message: 'Account deleted successfully.');
-    } on FirebaseAuthException catch (e) {
-      return _mapException(e);
-    } catch (e) {
-      return _mapUnknownError(e);
-    }
-  }
+  Future<AuthResult> deleteAccount() => _withCurrentUser((user) async {
+    await user.delete();
+    return const AuthMessageSuccess(message: AuthStrings.accountDeletedSuccess);
+  });
 
   @override
   Future<AuthResult> reauthenticate({
     required String email,
     required String password,
-  }) async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) {
-        return const AuthFailure(
-          message: 'No user is currently signed in.',
-          code: 'no-user',
-        );
-      }
-
-      final credential = EmailAuthProvider.credential(
-        email: email.trim(),
-        password: password,
-      );
-      await user.reauthenticateWithCredential(credential);
-      return _buildAuthSuccess();
-    } on FirebaseAuthException catch (e) {
-      return _mapException(e);
-    } catch (e) {
-      return _mapUnknownError(e);
-    }
-  }
+  }) => _withCurrentUser((user) async {
+    final credential = EmailAuthProvider.credential(
+      email: email.trim(),
+      password: password,
+    );
+    await user.reauthenticateWithCredential(credential);
+    return _buildAuthSuccess();
+  });
 
   AuthSuccess _buildAuthSuccess() {
     final user = _auth.currentUser;
@@ -222,8 +187,8 @@ class FirebaseAuthService implements AuthRepository {
 
   AuthFailure _mapUnknownError(Object e) {
     return AuthFailure(
-      message: 'An unexpected error occurred: $e',
-      code: 'unknown',
+      message: '${AuthStrings.unexpectedErrorPrefix}$e',
+      code: AuthStrings.unknownErrorCode,
     );
   }
 }

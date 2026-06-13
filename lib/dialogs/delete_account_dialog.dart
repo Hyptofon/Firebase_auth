@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import '../widgets/app_text_field.dart';
+
+import 'package:lr16_firebase_auth/constants/auth_strings.dart';
+import 'package:lr16_firebase_auth/constants/home_strings.dart';
+import 'package:lr16_firebase_auth/constants/app_strings.dart';
+import 'package:lr16_firebase_auth/widgets/app_text_field.dart';
 
 Future<String?> showDeleteAccountDialog(BuildContext context) async {
   final confirmed = await _showDeleteConfirmationDialog(context);
@@ -19,22 +23,19 @@ Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
         color: Theme.of(context).colorScheme.error,
         size: 40,
       ),
-      title: const Text('Delete Account'),
-      content: const Text(
-        'This action is permanent and cannot be undone. '
-        'All your data will be lost. Are you sure?',
-      ),
+      title: const Text(HomeStrings.deleteAccountTitle),
+      content: const Text(HomeStrings.deleteAccountDialogContent),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text('Cancel'),
+          child: const Text(AppStrings.cancelButton),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(context, true),
           style: FilledButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
-          child: const Text('Delete Forever'),
+          child: const Text(HomeStrings.deleteForeverButton),
         ),
       ],
     ),
@@ -42,20 +43,48 @@ Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
 }
 
 Future<String?> _showPasswordConfirmationDialog(BuildContext context) async {
-  final passwordController = TextEditingController();
-
-  final password = await showDialog<String>(
+  return showDialog<String>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Confirm Your Password'),
+    builder: (context) => const _PasswordConfirmationDialog(),
+  );
+}
+
+class _PasswordConfirmationDialog extends StatefulWidget {
+  const _PasswordConfirmationDialog();
+
+  @override
+  State<_PasswordConfirmationDialog> createState() =>
+      _PasswordConfirmationDialogState();
+}
+
+class _PasswordConfirmationDialogState
+    extends State<_PasswordConfirmationDialog> {
+  late final TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text(HomeStrings.confirmPasswordTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Enter your password to confirm account deletion.'),
+          const Text(HomeStrings.confirmPasswordSubtitle),
           const SizedBox(height: 16),
           PasswordTextField(
-            controller: passwordController,
-            labelText: 'Password',
+            controller: _passwordController,
+            labelText: AuthStrings.passwordLabel,
             textInputAction: TextInputAction.done,
           ),
         ],
@@ -63,19 +92,19 @@ Future<String?> _showPasswordConfirmationDialog(BuildContext context) async {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(AppStrings.cancelButton),
         ),
         FilledButton(
-          onPressed: () => Navigator.pop(context, passwordController.text),
+          onPressed: () {
+            final password = _passwordController.text;
+            Navigator.pop(context, password.isEmpty ? null : password);
+          },
           style: FilledButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
-          child: const Text('Confirm'),
+          child: const Text(HomeStrings.confirmButton),
         ),
       ],
-    ),
-  );
-
-  passwordController.dispose();
-  return (password == null || password.isEmpty) ? null : password;
+    );
+  }
 }
